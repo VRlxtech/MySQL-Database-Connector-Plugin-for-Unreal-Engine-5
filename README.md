@@ -35,5 +35,5 @@ Note : Example Blueprint called SQL_TESTER and some ohter Blueprints containing 
 
 ## Currently supported platforms
 The current version was built and tested using Windows with Unreal Engine version 5.0, 5.1, 5.2
-
 Win32 and Win64 platforms are currently supported and tested. 
+Tested using Visual Studio 2022 c/c++, c#
