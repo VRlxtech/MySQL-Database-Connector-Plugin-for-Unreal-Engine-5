@@ -32,7 +32,7 @@ Note : Example Blueprint called SQL_TESTER and some ohter Blueprints containing 
 		Using this plugin in a production is probably not a very good solution as all the database related things are in the game and can potentially be abused... 
 
 ## Currently supported platforms
-The current version was built and tested using Windows with Unreal Engine version 5.0, 5.1, 5.2
+The current version was built and tested using Windows with Unreal Engine version 5.0
 
 Win32 and Win64 platforms are currently supported and tested. 
 
