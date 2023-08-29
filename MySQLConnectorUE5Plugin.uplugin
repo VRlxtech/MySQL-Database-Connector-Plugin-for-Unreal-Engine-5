@@ -1,0 +1,19 @@
+{
+    "FileVersion" : 3,
+    "FriendlyName" : "MySQLConnectorUE5 Plugin",
+    "Version" : 2,
+    "VersionName": "2.0",
+    "Description" : "Exposing MySQLConnector functionality to UE5",
+    "Category" : "Database",
+    "CreatedBy" : "Dennis Drews",
+    "CreatedByURL" : "http://medishel.com",
+    "CanContainContent" : "true",
+    "Modules" :
+    [
+        {
+            "Name" : "MySQLConnectorUE5Plugin",
+            "Type" : "Runtime",
+			"LoadingPhase" : "Default"
+        } 
+    ]
+}
