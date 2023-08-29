@@ -41,7 +41,7 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 	}
 
 	// min time and max time to wait for connection
-	if (Ctimeout < 1 || Ctimeout>120)
+	if (Ctimeout < 1 || Ctimeout>240)
 		Ctimeout = 5;
 
 
