@@ -1,9 +1,9 @@
 #pragma once
 
-#include "mysql.h"
-#include "MySQLConnection.h"
-#include "MySQLConnectorStructs.h"
-#include "Kismet/BlueprintFunctionLibrary.h"
+#include  "mysql.h"
+#include  "MySQLConnection.h"
+#include  "MySQLConnectorStructs.h"
+#include  "Kismet/BlueprintFunctionLibrary.h"
 #include "Engine.h"
 #include "Engine/NetConnection.h"
 #include "MySQLDatabase.generated.h"
@@ -27,7 +27,7 @@ struct MYSQLCONNECTORUE5PLUGIN_API FMySQLConnectorKeyValuePair
 
 		/** The database table field name */
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Key Value Pair")
-			FString Key;
+		FString Key;
 
 	/** The value of the field */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Key Value Pair")
@@ -41,7 +41,7 @@ struct MYSQLCONNECTORUE5PLUGIN_API FMySQLConnectorQueryResultRow
 
 		/** A list of field name, field value pairs */
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector Query Result")
-			TArray<FMySQLConnectorKeyValuePair> Fields;
+		TArray<FMySQLConnectorKeyValuePair> Fields;
 };
 
 USTRUCT(BlueprintType)
@@ -81,8 +81,8 @@ namespace MySQLConnectorResultValueTypes
 struct MySQLConnectorResultField
 {
 	FString StringValue;
-		double DoubleValue;
-			int64 IntValue;
+	double DoubleValue;
+	int64 IntValue;
 
 	FString Name;
 	MySQLConnectorResultValueTypes::MySQLConnectorResultValType Type;
@@ -111,6 +111,10 @@ struct MySQLConnectorQueryResult
 };
 
 
+
+
+
+
 /**
 * MySQLConnector main database class.
 */
@@ -122,7 +126,8 @@ class MYSQLCONNECTORUE5PLUGIN_API UMySQLDatabase : public UObject
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "MySQLConnector")
-		static UMySQLConnection* MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName);
+	static UMySQLConnection* MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName, int ConnectionTimeout, int ReadTimeout, int WriteTimeout);
+
 
 	UFUNCTION(BlueprintCallable, Category = "MySQLConnector|Query")
 		static bool MySQLConnectorExecuteQuery(FString Query, UMySQLConnection* Connection);
@@ -161,5 +166,8 @@ public:
 private:
 	/** Runs a query and returns fetched rows. */
 	static MySQLConnectorQueryResult RunQueryAndGetResults(FString Query, UMySQLConnection* Connection);
+
+
+
 
 };

@@ -32,7 +32,7 @@ struct MYSQLCONNECTORUE5PLUGIN_API FMySQLConnectorPrimaryKey
 
 		/** String with piece if SQL script*/
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
-			FString ResultStr = "";
+		FString ResultStr = "";
 };
 
 USTRUCT(BlueprintType)
@@ -42,15 +42,15 @@ struct MYSQLCONNECTORUE5PLUGIN_API FMySQLConnectorTable
 
 		/** Database name*/
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
-			FString DatabaseName = "";
+		FString DatabaseName = "";
 
 	/** Table name*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
-			FString TableName = "";
+		FString TableName = "";
 
 	/** Array with Fields*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
-			TArray<FMySQLConnectorTableField> Fields;
+		TArray<FMySQLConnectorTableField> Fields;
 
 	///** Primary Key */
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
@@ -58,6 +58,6 @@ struct MYSQLCONNECTORUE5PLUGIN_API FMySQLConnectorTable
 
 	/** Created Key */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MySQLConnector|Tables|Fields")
-			bool Created = false;
+		bool Created = false;
 
 };
