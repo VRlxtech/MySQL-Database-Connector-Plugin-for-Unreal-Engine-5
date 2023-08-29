@@ -8,29 +8,75 @@ UMySQLDatabase::UMySQLDatabase(const FObjectInitializer& ObjectInitializer)
 {
 }
 
-UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName)
+UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName, int ConnectionTimeout, int ReadTimeout, int WriteTimeout )
 {
 	std::string HostString(TCHAR_TO_UTF8(*Host));
 	std::string UserNameString(TCHAR_TO_UTF8(*UserName));
 	std::string UserPasswordString(TCHAR_TO_UTF8(*UserPassword));
 	std::string DatabaseNameString(TCHAR_TO_UTF8(*DatabaseName));
+	unsigned int Ctimeout = (unsigned int)ConnectionTimeout;
+
+
+	unsigned int Rtimeout = (unsigned int)ReadTimeout;
+	unsigned int Wimeout = (unsigned int)WriteTimeout;
+
 
 	UMySQLConnection* cs = NewObject<UMySQLConnection>();
 
 	if (mysql_library_init(0, nullptr, nullptr) != 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: FAILED TO INIT mysql library"));
-			GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("FAILED TO INIT mysql library"));
-				mysql_library_end();
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("FAILED TO INIT mysql library"));
+		mysql_library_end();
 		return nullptr;
 	}
-
+	
 	cs->globalCon = mysql_init(nullptr);
 	if (!cs->globalCon)
 	{
 		
 		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: FAILED TO INIT connection"));
-			mysql_library_end();
+		mysql_library_end();
+		return nullptr;
+	}
+
+	// min time and max time to wait for connection
+	if (Ctimeout < 1 || Ctimeout>120)
+		Ctimeout = 5;
+
+
+	/* set timeout to wait for timeout */
+	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_CONNECT_TIMEOUT, (void*)&Ctimeout) != 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set connection time out"));
+		UE_LOG(LogTemp, Error, TEXT("MySQLConnector: Can't set set Connection time out"));
+		UMySQLConnection::MySQLCloseConnection(cs);
+		return nullptr;
+	}
+
+	// min time and max time to wait for read timeout
+	if (Rtimeout < 1 || Rtimeout>240)
+		Rtimeout = 5;
+
+	/* set timeout to wait for timeout */
+	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_READ_TIMEOUT, (void*)&Rtimeout) != 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set read time out"));
+		UE_LOG(LogTemp, Error, TEXT("MySQLConnector: Can't set set Read time out"));
+		UMySQLConnection::MySQLCloseConnection(cs);
+		return nullptr;
+	}
+
+	// min time and max time to wait for write timeout
+	if (Wimeout < 1 || Wimeout>240)
+		Wimeout = 5;
+
+	/* set timeout to wait for timeout */
+	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_WRITE_TIMEOUT, (void*)&Wimeout) != 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set write time out"));
+		UE_LOG(LogTemp, Error, TEXT("MySQLConnector: Can't set set Write time out"));
+		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
 
@@ -44,16 +90,16 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		FString error = mysql_error(cs->globalCon);
 
 		UE_LOG(LogTemp, Error, TEXT("%s"),*error);
-			UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Failed to Connect to Database!"));
-				UMySQLConnection::MySQLCloseConnection(cs);
+		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Failed to Connect to Database!"));
+		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
 
 	if (mysql_set_character_set(cs->globalCon, "utf8") != 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set UTF-8 with mysql_set_character_set"));
-			UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Can't set UTF-8 with mysql_set_character_set"));
-				UMySQLConnection::MySQLCloseConnection(cs);
+		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Can't set UTF-8 with mysql_set_character_set"));
+		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
 
@@ -94,9 +140,9 @@ bool UMySQLDatabase::DropTable(const FString TableName, UMySQLConnection* Connec
 
 	bool idxCrSts = true;
 
-		FString Query = "DROP TABLE " + TableName;
+	FString Query = "DROP TABLE " + TableName;
 
-			idxCrSts = MySQLConnectorExecuteQuery(Query, Connection);
+	idxCrSts = MySQLConnectorExecuteQuery(Query, Connection);
 
 	return idxCrSts;
 }
@@ -139,14 +185,14 @@ FMySQLConnectorTable UMySQLDatabase::CreateTable(const FString TableName,
 	};
 
 	t.DatabaseName = TEXT("");
-		t.TableName = TableName;
-			t.Fields = Fields;
+	t.TableName = TableName;
+	t.Fields = Fields;
 	//t.PK = PK;
 
 	FString query = "";
-		query += "CREATE TABLE IF NOT EXISTS ";
-			query += TableName;
-				query += "(";
+	query += "CREATE TABLE IF NOT EXISTS ";
+	query += TableName;
+	query += "(";
 
 	bool singlePrimaryKeyExists = false;
 
@@ -165,7 +211,7 @@ FMySQLConnectorTable UMySQLDatabase::CreateTable(const FString TableName,
 	//UE_LOG(LogMySQL_Database, Error, TEXT("1!!!%s!!!"), *query);
 
 	query = query.Left(query.Len() - 2);
-		query = query + ");";
+	query = query + ");";
 
 	//UE_LOG(LogMySQL_Database, Error, TEXT("2!!!%s!!!"), *query);
 
@@ -189,8 +235,8 @@ FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorINT(const FString FieldN
 			);*/
 
 	FMySQLConnectorTableField f;
-		f.FieldType = "INT";
-			f.FieldName = FieldName;
+	f.FieldType = "INT";
+	f.FieldName = FieldName;
 
 	FString outStr = "`" + FieldName + "` INT ";
 	if (AI)
@@ -221,8 +267,8 @@ FMySQLConnectorTableField UMySQLDatabase::MySQLConnectorVARCHAR(const FString Fi
 	*/
 
 	FMySQLConnectorTableField f;
-		f.FieldType = "VARCHAR(" + FieldLength + ")";
-			f.FieldName = FieldName;
+	f.FieldType = "VARCHAR(" + FieldLength + ")";
+	f.FieldName = FieldName;
 
 	FString outStr = "";
 
@@ -284,16 +330,16 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 	if (!Connection)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Connection is NULL!"));
-			resultOutput.ErrorMessage = "Connection is NULL!";
-				resultOutput.Success = false;
+		resultOutput.ErrorMessage = "Connection is NULL!";
+		resultOutput.Success = false;
 		return resultOutput;
 	};
 
 	if (!Connection->MySQLCheckConnection())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Not connected!"));
-			resultOutput.ErrorMessage = "Not connected!";
-				resultOutput.Success = false;
+		resultOutput.ErrorMessage = "Not connected!";
+		resultOutput.Success = false;
 		return resultOutput;
 	};
 
@@ -314,8 +360,8 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 	{
 		//finish_with_error(con);		
 		UE_LOG(LogTemp, Error, TEXT("Result is NULL!"));
-			resultOutput.ErrorMessage = "Result is NULL!";
-				resultOutput.Success = false;
+		resultOutput.ErrorMessage = "Result is NULL!";
+		resultOutput.Success = false;
 		return resultOutput;
 	}
 
@@ -334,7 +380,7 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 			//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Type is:") + NewString);
 
 			fieldTypes.Add(fields[i].type);
-				fieldNames.Add(UTF8_TO_TCHAR(fields[i].name));
+			fieldNames.Add(UTF8_TO_TCHAR(fields[i].name));
 		}
 	}
 
@@ -354,7 +400,7 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 			MySQLConnectorResultField val;
 
 			FString columnNameStr = fieldNames[i];
-				val.Name = columnNameStr;
+			val.Name = columnNameStr;
 
 			FString fieldValueStr = (UTF8_TO_TCHAR(row[i]));
 
@@ -364,20 +410,20 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 				//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Type is: MYSQL_TYPE_LONG "));
 				//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("VALUE is '") + fieldValueStr + TEXT("' "));
 				val.Type = MySQLConnectorResultValueTypes::Int;
-					val.IntValue = FCString::Atoi(*fieldValueStr);
+				val.IntValue = FCString::Atoi(*fieldValueStr);
 				break;
 			case enum_field_types::MYSQL_TYPE_VAR_STRING:
 				//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Type is: MYSQL_TYPE_VAR_STRING"));
 				//GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("VALUE is '") + fieldValueStr + TEXT("' "));
 				val.Type = MySQLConnectorResultValueTypes::Varchar;
-					val.StringValue = fieldValueStr;
+				val.StringValue = fieldValueStr;
 				break;
 			default:
 				/*GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Type is: UNKNOWN"));
 				GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("VALUE is '") + fieldValueStr + TEXT("' "));*/
 				val.Type = MySQLConnectorResultValueTypes::UnsupportedValueType;
-					val.IntValue = FCString::Atoi(*fieldValueStr);
-						val.StringValue = fieldValueStr;
+				val.IntValue = FCString::Atoi(*fieldValueStr);
+				val.StringValue = fieldValueStr;
 			}
 
 			rowVal.Fields.Add(val);
@@ -389,8 +435,7 @@ MySQLConnectorQueryResult UMySQLDatabase::RunQueryAndGetResults(FString Query, U
 	mysql_free_result(result);
 
 	resultOutput.Results = resultRows;
-		resultOutput.Success = true;
-	
+	resultOutput.Success = true;
 	return resultOutput;
 }
 
@@ -404,14 +449,14 @@ FMySQLConnectoreQueryResult UMySQLDatabase::MySQLConnectorGetData(const FString&
 	if (!Connection || !Connection->MySQLCheckConnection())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Not connected or Connection is NULL!"));
-			result.ErrorMessage = "Not connected or Connection is NULL!";
-				result.Success = false;
+		result.ErrorMessage = "Not connected or Connection is NULL!";
+		result.Success = false;
 		return result;
 	}
 
 	MySQLConnectorQueryResult queryResult = RunQueryAndGetResults(Query, Connection);
-		result.Success = queryResult.Success;
-			result.ErrorMessage = queryResult.ErrorMessage;
+	result.Success = queryResult.Success;
+	result.ErrorMessage = queryResult.ErrorMessage;
 
 	for (auto row : queryResult.Results)
 	{
@@ -419,8 +464,8 @@ FMySQLConnectoreQueryResult UMySQLDatabase::MySQLConnectorGetData(const FString&
 		for (auto field : row.Fields)
 		{
 			FMySQLConnectorKeyValuePair outField;
-				outField.Key = field.Name;
-					outField.Value = field.ToString();
+			outField.Key = field.Name;
+			outField.Value = field.ToString();
 
 			outRow.Fields.Add(outField);
 		}
