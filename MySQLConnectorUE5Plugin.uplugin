@@ -5,7 +5,7 @@
     "VersionName": "2.0",
     "Description" : "Exposing MySQLConnector functionality to UE5",
     "Category" : "Database",
-    "CreatedBy" : "Dennis Drews",
+    "CreatedBy" : "VRlxtech",
     "CreatedByURL" : "http://medishel.com",
     "CanContainContent" : "true",
     "Modules" :
