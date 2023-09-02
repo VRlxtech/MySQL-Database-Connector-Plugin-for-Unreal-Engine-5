@@ -1,10 +1,10 @@
-## MySQL-Database-Connector-Plugin-for-Unreal-Engine-5
-Updated from MySQLConnectorUE4Plugin see https://github.com/KhArtNJava/MySQLConnectorUE4Plugin
+## MySqlConnect-for-Unreal-Engine-5
+
 
 MySQL Database Connector Plugin for Unreal Engine 5
 
 ## What is it?
-A plugin for UE5 that provides code and blueprint functionality that enables you to use MySQL databases in your projects based on MySQLConnectorUE4Plugin
+A plugin for UE5 that provides code and blueprint functionality that enables you to use MySQL databases in your projects. 
 
 By using reflection it is possible to get data directly into member properties of C++ classes and blueprints, provided that the database field names match the UObject property names and that they have compatible data types. By using a normal query you can get data from tables into an array of string key -> value pairs.
 Both C++ and blueprints are supported. For convenience, queries can be constructed from nodes in blueprints (easier to plug in variables into queries) or entered directly as a string. From C++ you're expected to use the string version of the methods.
@@ -16,7 +16,7 @@ Both C++ and blueprints are supported. For convenience, queries can be construct
 	
 	ProjectName
 	-	Plugins
-		-	MySQLConnectorUE5Plugin
+		-	MySqlConnect
 			-	Content
 			-	Resources
 			-	Source
@@ -26,7 +26,8 @@ Both C++ and blueprints are supported. For convenience, queries can be construct
 5. Wait until the building has finished!! 
 6. Launch the UE5 Editor and start building your new connection see the images in the wiki directory
 
-Note : Example Blueprint called SQL_TESTER and some ohter Blueprints containing example Database related data as well as a SQL-Script to generate the Database for the Example BP (enable "show Plugin Content" in Project Browser).
+Note : Example Blueprint called SQL_TESTER and some ohter Blueprints containing example Database related data as well as a SQL-Script to generate the Database
+		for the Example BP (enable "show Plugin Content" in Project Browser).
 		You can set up a Database, change the Login-data in the 'Information BP', run the SQL-Script and open the 'DemoRoom' Level to test the Database.
 		If everything works there should be some prints on screen after 5 seconds of playing.
 		Using this plugin in a production is probably not a very good solution as all the database related things are in the game and can potentially be abused... 
