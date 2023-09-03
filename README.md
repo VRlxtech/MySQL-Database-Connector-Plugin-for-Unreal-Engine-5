@@ -26,12 +26,6 @@ Both C++ and blueprints are supported. For convenience, queries can be construct
 5. Wait until the building has finished!! 
 6. Launch the UE5 Editor and start building your new connection see the images in the wiki directory
 
-Note : Example Blueprint called SQL_TESTER and some ohter Blueprints containing example Database related data as well as a SQL-Script to generate the Database
-		for the Example BP (enable "show Plugin Content" in Project Browser).
-		You can set up a Database, change the Login-data in the 'Information BP', run the SQL-Script and open the 'DemoRoom' Level to test the Database.
-		If everything works there should be some prints on screen after 5 seconds of playing.
-		Using this plugin in a production is probably not a very good solution as all the database related things are in the game and can potentially be abused... 
-
 ## Currently supported platforms
 The current version was built and tested using Windows with Unreal Engine version 5.0,5.1,5.2,5.3
 
