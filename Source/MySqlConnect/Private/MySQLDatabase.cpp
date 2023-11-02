@@ -10,6 +10,7 @@ UMySQLDatabase::UMySQLDatabase(const FObjectInitializer& ObjectInitializer)
 
 UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString UserName, FString UserPassword, FString DatabaseName, int ConnectionTimeout, int ReadTimeout, int WriteTimeout )
 {
+
 	std::string HostString(TCHAR_TO_UTF8(*Host));
 	std::string UserNameString(TCHAR_TO_UTF8(*UserName));
 	std::string UserPasswordString(TCHAR_TO_UTF8(*UserPassword));
@@ -30,22 +31,25 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		mysql_library_end();
 		return nullptr;
 	}
-	
+
 	cs->globalCon = mysql_init(nullptr);
+
 	if (!cs->globalCon)
 	{
 		
 		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: FAILED TO INIT connection"));
 		mysql_library_end();
+
 		return nullptr;
 	}
-
+	
 	// min time and max time to wait for connection
 	if (Ctimeout < 1 || Ctimeout>240)
 		Ctimeout = 5;
 
-
+	
 	/* set timeout to wait for timeout */
+	
 	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_CONNECT_TIMEOUT, (void*)&Ctimeout) != 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set connection time out"));
@@ -53,12 +57,14 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
+	
 
 	// min time and max time to wait for read timeout
+	
 	if (Rtimeout < 1 || Rtimeout>240)
 		Rtimeout = 5;
-
-	/* set timeout to wait for timeout */
+	
+	// set timeout to wait for timeout 
 	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_READ_TIMEOUT, (void*)&Rtimeout) != 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set read time out"));
@@ -66,12 +72,12 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
-
+	
 	// min time and max time to wait for write timeout
 	if (Wimeout < 1 || Wimeout>240)
 		Wimeout = 5;
 
-	/* set timeout to wait for timeout */
+	// set timeout to wait for timeout 
 	if (mysql_optionsv(cs->globalCon, MYSQL_OPT_WRITE_TIMEOUT, (void*)&Wimeout) != 0)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Cyan, TEXT("MySQLConnector: Can't set set write time out"));
@@ -79,19 +85,26 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
+	
 
-	if (!mysql_real_connect(cs->globalCon,
+	
+
+	cs->globalCon=mysql_real_connect( cs->globalCon,
 	                        HostString.c_str(),
 	                        UserNameString.c_str(),
 	                        UserPasswordString.c_str(),
 	                        DatabaseNameString.c_str(),
-	                        3306, nullptr, 0))
+		3306, nullptr, 0);
+
+	if (!cs->globalCon)
 	{
 		FString error = mysql_error(cs->globalCon);
 
 		UE_LOG(LogTemp, Error, TEXT("%s"),*error);
 		UE_LOG(LogTemp, Error, TEXT("MySQLInitConnection: Failed to Connect to Database!"));
+		
 		UMySQLConnection::MySQLCloseConnection(cs);
+
 		return nullptr;
 	}
 
@@ -102,6 +115,7 @@ UMySQLConnection* UMySQLDatabase::MySQLInitConnection(FString Host, FString User
 		UMySQLConnection::MySQLCloseConnection(cs);
 		return nullptr;
 	}
+
 
 	return cs;
 }
