@@ -33,3 +33,6 @@ Win64 platforms are currently supported and tested.
 
 Tested using Visual Studio 2022 c/c++, c#
 
+## Known Problems
+You need to open database only once and level it open during access of game, then create a reference.
+
