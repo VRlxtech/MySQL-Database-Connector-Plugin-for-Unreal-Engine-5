@@ -20,7 +20,7 @@ Both C++ and blueprints are supported. For convenience, queries can be construct
 			-	Content
 			-	Resources
 			-	Source
-			-	...
+			
 3. Rightclick on the UProject file in the Root directory of your project and click on "Generate Visual Studio Project Files"
 4. Open the Visiual Studio Project file and Rightclick on your Project -> Project Only -> Run Code Analysis on 'ProjectName'
 5. Wait until the building has finished!! 
